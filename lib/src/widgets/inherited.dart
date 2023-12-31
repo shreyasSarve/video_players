@@ -7,12 +7,14 @@ class PlayerProvider extends InheritedWidget {
   final Player player;
   final PlayerConfiguration configuration;
   final PlayerControls controls;
+  final Widget errorWidget;
   const PlayerProvider({
     super.key,
     required this.controls,
     required this.player,
     required this.configuration,
     required Widget child,
+    required this.errorWidget,
   }) : super(child: child);
 
   static PlayerProvider? of(BuildContext context) {

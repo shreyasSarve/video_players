@@ -55,7 +55,14 @@ class _LandscapePlayerState extends State<LandscapePlayer> {
                     ),
                     Positioned.fill(
                       bottom: 0,
-                      child: provider.controls.landscape(context),
+                      child: ValueListenableBuilder(
+                        valueListenable: _player.error,
+                        builder: (context, value, child) {
+                          if (!value) return child!;
+                          return PlayerProvider.of(context)!.errorWidget;
+                        },
+                        child: provider.controls.landscape(context),
+                      ),
                     ),
                   ],
                 ),

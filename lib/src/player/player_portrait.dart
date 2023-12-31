@@ -45,7 +45,14 @@ class _PortraitPlayerState extends State<PortraitPlayer> {
                   ),
                   Positioned.fill(
                     bottom: 0,
-                    child: provider.controls.portrait(context),
+                    child: ValueListenableBuilder(
+                      valueListenable: _player.error,
+                      builder: (context, value, child) {
+                        if (!value) return child!;
+                        return PlayerProvider.of(context)!.errorWidget;
+                      },
+                      child: provider.controls.portrait(context),
+                    ),
                   ),
                 ],
               ),

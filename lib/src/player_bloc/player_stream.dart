@@ -109,7 +109,9 @@ class Player extends _PlayerState {
         add(Pause());
         add(ShowControls(always: true));
       }
-      if (_controller.value.hasError) _isError.add(true);
+      if (_controller.value.hasError != _isError.value) {
+        _isError.add(_controller.value.hasError);
+      }
     });
   }
 

@@ -18,6 +18,7 @@ class VideoPlayerWidget extends StatefulWidget {
     PlayerControlType? controlType,
     PlayerControls? controls,
     PlayerConfiguration? configuration,
+    Widget? errorWidget,
   }) {
     if (configuration != null) {
       this.configuration = configuration;
@@ -40,13 +41,21 @@ class VideoPlayerWidget extends StatefulWidget {
     } else {
       this.controls = controlType!.getControls();
     }
+    this.errorWidget = errorWidget ?? defaultError;
   }
 
   final Uri uri;
   late final PlayerConfiguration configuration;
   late final PlayerControls controls;
+  late final Widget errorWidget;
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+  Widget get defaultError {
+    return const Icon(
+      Icons.wifi_tethering_error_outlined,
+      size: 40,
+    );
+  }
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
@@ -62,6 +71,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   Widget build(BuildContext context) {
     return PlayerProvider(
       player: _player,
+      errorWidget: widget.errorWidget,
       configuration: widget.configuration,
       controls: widget.controls,
       child: ValueListenableBuilder(

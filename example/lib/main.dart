@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:player/player/player.dart';
-import 'package:player/players/player_controls.dart';
+import 'package:player/player.dart';
 
 const String streamUrl2 =
     'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
