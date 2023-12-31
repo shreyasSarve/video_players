@@ -1,6 +1,6 @@
 library player;
 
-import 'dart:math';
+import 'dart:math' show min, max;
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -11,7 +11,7 @@ part 'stream_creator.dart';
 
 class Player extends _PlayerState {
   static const _delay = Duration(
-    seconds: 5,
+    seconds: 2,
   );
   Player({required super.url});
 
@@ -37,7 +37,7 @@ class Player extends _PlayerState {
         _init();
         break;
       case ShowControls:
-        _showControls();
+        _showControls((event as ShowControls).always);
         break;
       case HideControls:
         _hideControls();
@@ -106,7 +106,8 @@ class Player extends _PlayerState {
       _duration.add(_controller.value.duration);
       _completed.add(value.position.inSeconds / value.duration.inSeconds);
       if (_controller.value.isCompleted) {
-        _isPlaying.add(false);
+        add(Pause());
+        add(ShowControls(always: true));
       }
       if (_controller.value.hasError) _isError.add(true);
     });
@@ -134,14 +135,13 @@ class Player extends _PlayerState {
 
   void _pause() {
     final controller = _controller;
-    if (controller.value.isPlaying) {
-      controller.pause();
-      _isPlaying.add(false);
+    if (isPlaying.value) {
+      controller.pause().then((value) => _isPlaying.add(false));
     }
   }
 
   void _togglePlayer() {
-    if (_controller.value.isPlaying) {
+    if (isPlaying.value) {
       _pause();
     } else {
       _play();
@@ -150,9 +150,11 @@ class Player extends _PlayerState {
 
   void _play() {
     final controller = _controller;
-    if (controller.value.isInitialized && !controller.value.isPlaying) {
-      controller.play();
-      _isPlaying.add(true);
+    if (isInitialised && !isPlaying.value) {
+      controller.play().then((value) {
+        _isPlaying.add(true);
+        _hideControls();
+      });
     }
   }
 
@@ -174,12 +176,14 @@ class Player extends _PlayerState {
     _controller.seekTo(position);
   }
 
-  void _showControls() {
+  void _showControls(bool always) {
     _showingController = true;
     _showController.add(_showingController);
-    Future.delayed(_delay, () {
-      _hideControls();
-    });
+    if (!always) {
+      Future.delayed(_delay, () {
+        _hideControls();
+      });
+    }
   }
 
   void _hideControls() {
@@ -191,7 +195,7 @@ class Player extends _PlayerState {
     if (_showingController) {
       _hideControls();
     } else {
-      _showControls();
+      _showControls(false);
     }
   }
 

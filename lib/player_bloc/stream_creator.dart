@@ -23,4 +23,9 @@ class StreamCreator<T> {
   void dispose() {
     _controller.dispose();
   }
+
+  @override
+  String toString() {
+    return _controller.value.toString();
+  }
 }

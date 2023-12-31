@@ -2,39 +2,54 @@ library player_widget;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:player/helper/defaults.dart';
-import 'package:player/helper/utils.dart';
 import 'package:player/player/config/configuration.dart';
-import 'package:player/player/config/options.dart';
 import 'package:player/player_bloc/player_stream.dart';
+import 'package:player/players/player_controls.dart';
+import 'package:player/widgets/inherited.dart';
 import 'package:video_player/video_player.dart';
 
-part './player_controls.dart';
-part './player_icon.dart';
 part './player_landscape.dart';
 part './player_portrait.dart';
 
-///* - uri : Uri of url which you want to stream/watch
-class PlayerWidget extends StatefulWidget {
-  PlayerWidget({
+class VideoPlayerWidget extends StatefulWidget {
+  VideoPlayerWidget({
     super.key,
     required this.uri,
+    PlayerControlType? controlType,
+    PlayerControls? controls,
     PlayerConfiguration? configuration,
   }) {
     if (configuration != null) {
       this.configuration = configuration;
     } else {
-      configuration = PlayerConfiguration.defaultConfig();
+      this.configuration = PlayerConfiguration.defaultConfig();
+    }
+    final controlTypeSet = controlType != null;
+    final controlsSet = controls != null;
+    assert(
+      controlTypeSet || controlsSet,
+      "Both controlType & controls cannot be null set one of them",
+    );
+    assert(
+      !controlTypeSet || !controlsSet,
+      "Both controlType & controls cannot be set set only one of them",
+    );
+
+    if (controls != null) {
+      this.controls = controls;
+    } else {
+      this.controls = controlType!.getControls();
     }
   }
+
   final Uri uri;
   late final PlayerConfiguration configuration;
+  late final PlayerControls controls;
   @override
-  State<PlayerWidget> createState() => _PlayerWidgetState();
+  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
 }
 
-class _PlayerWidgetState extends State<PlayerWidget> {
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   late final Player _player;
   @override
   void initState() {
@@ -45,22 +60,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: _player.fullscreen,
-      builder: (context, value, child) {
-        if (value) {
-          return LandscapePlayer(
-            player: _player,
-            configuration: widget.configuration,
-          );
-        }
-        SystemChrome.restoreSystemUIOverlays();
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-        return PortraitPlayer(
-          player: _player,
-          configuration: widget.configuration,
-        );
-      },
+    return PlayerProvider(
+      player: _player,
+      configuration: widget.configuration,
+      controls: widget.controls,
+      child: ValueListenableBuilder(
+        valueListenable: _player.fullscreen,
+        builder: (context, value, child) {
+          if (value) {
+            return const LandscapePlayer();
+          }
+          SystemChrome.restoreSystemUIOverlays();
+          SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+          return const PortraitPlayer();
+        },
+      ),
     );
   }
 }

@@ -19,6 +19,10 @@ class PlayerIconCofiguration {
 class DefaultPlayerIconConfiguration extends PlayerIconCofiguration {
   static const defaultColor = Colors.white;
   static const defaultSize = 25.0;
-  DefaultPlayerIconConfiguration()
-      : super(color: defaultColor, size: defaultSize);
+  static const smallIconSize = 15.0;
+  DefaultPlayerIconConfiguration({bool isSmall = false})
+      : super(
+          color: defaultColor,
+          size: isSmall ? smallIconSize : defaultSize,
+        );
 }

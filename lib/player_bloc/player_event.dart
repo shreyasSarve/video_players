@@ -15,7 +15,10 @@ class TogglePlay extends PlayerEvent {}
 
 class InitialisePlayer extends PlayerEvent {}
 
-class ShowControls extends PlayerEvent {}
+class ShowControls extends PlayerEvent {
+  final bool always;
+  ShowControls({this.always = false});
+}
 
 class HideControls extends PlayerEvent {}
 
